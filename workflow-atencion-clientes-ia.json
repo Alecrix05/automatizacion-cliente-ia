@@ -1,0 +1,161 @@
+{
+  "name": "My workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "prueba-cliente",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "de5712aa-12a3-440c-a38d-2f34338602f9",
+      "name": "Webhook",
+      "webhookId": "46d866ee-d625-42ac-a3ce-1ab1f9b95477"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e383e965-bc10-455c-a76c-fb0dfc45b7be",
+              "name": "mensaje",
+              "value": "={{$json.body.mensaje}}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        208,
+        0
+      ],
+      "id": "8a5849ea-9127-4a3f-8ece-18f84699b3d2",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "openrouter/free",
+          "mode": "id"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        416,
+        176
+      ],
+      "id": "7ff59753-ace7-4b45-85af-a0da2ccf1f22",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "s6Sh7lmXeqDSboEr",
+          "name": "OpenAI account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Eres el asistente virtual de un negocio de soporte técnico de computadoras en México.\n\nServicios:\n\n* Instalación de Windows\n* Formateo de computadoras\n* Instalación de programas\n* Eliminación de virus\n* Configuración de impresoras\n* Armado de computadoras\n* Instalación de drivers\n* Mantenimiento preventivo\n\nReglas:\n\n* Responde de forma breve y profesional.\n* Nunca inventes precios.\n* Si el precio no está definido, indica que un técnico proporcionará la cotización.\n* Si el cliente no proporciona suficiente información, solicita más detalles.\n* No hables sobre licencias de Microsoft ni precios internacionales a menos que el cliente lo pregunte.\n* Responde siempre en español.\n\nSi un cliente pregunta por un servicio, explica brevemente en qué consiste y pregunta los datos necesarios para cotizar.\n",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        416,
+        0
+      ],
+      "id": "8d24ea19-3467-4262-bca4-bb1e2da8eccd",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"respuesta\": \"{{$json.output}}\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        768,
+        0
+      ],
+      "id": "fa833fbd-5386-4bb8-8ec6-631aa3639175",
+      "name": "Respond to Webhook"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "a7f3880e-67b5-40df-971e-2414dbd5051d",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "2bb3dcc5c596ad4c376ce061dfe8f2c68cbfb30a5fa40ebfafb72f3c49176e8e"
+  },
+  "nodeGroups": [],
+  "id": "LetROuJvGNdTZOE9",
+  "tags": []
+}
