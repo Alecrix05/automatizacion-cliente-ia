@@ -14,7 +14,7 @@
         0,
         0
       ],
-      "id": "de5712aa-12a3-440c-a38d-2f34338602f9",
+      "id": "93828b7c-e543-4c36-adba-7f8c212bfc13",
       "name": "Webhook",
       "webhookId": "46d866ee-d625-42ac-a3ce-1ab1f9b95477"
     },
@@ -38,7 +38,7 @@
         208,
         0
       ],
-      "id": "8a5849ea-9127-4a3f-8ece-18f84699b3d2",
+      "id": "92ae9a96-cb97-400a-95ca-1e13bf78b411",
       "name": "Edit Fields"
     },
     {
@@ -57,11 +57,11 @@
         416,
         176
       ],
-      "id": "7ff59753-ace7-4b45-85af-a0da2ccf1f22",
+      "id": "5e91b1b6-1238-4759-94c4-9563d18c1330",
       "name": "OpenAI Chat Model",
       "credentials": {
         "openAiApi": {
-          "id": "s6Sh7lmXeqDSboEr",
+          "id": "zaE4B3WlAeDr25VS",
           "name": "OpenAI account 2"
         }
       }
@@ -69,8 +69,10 @@
     {
       "parameters": {
         "promptType": "define",
-        "text": "=Eres el asistente virtual de un negocio de soporte técnico de computadoras en México.\n\nServicios:\n\n* Instalación de Windows\n* Formateo de computadoras\n* Instalación de programas\n* Eliminación de virus\n* Configuración de impresoras\n* Armado de computadoras\n* Instalación de drivers\n* Mantenimiento preventivo\n\nReglas:\n\n* Responde de forma breve y profesional.\n* Nunca inventes precios.\n* Si el precio no está definido, indica que un técnico proporcionará la cotización.\n* Si el cliente no proporciona suficiente información, solicita más detalles.\n* No hables sobre licencias de Microsoft ni precios internacionales a menos que el cliente lo pregunte.\n* Responde siempre en español.\n\nSi un cliente pregunta por un servicio, explica brevemente en qué consiste y pregunta los datos necesarios para cotizar.\n",
-        "options": {}
+        "text": "={{$json.mensaje}}",
+        "options": {
+          "systemMessage": "=Eres el asistente virtual de un negocio de soporte técnico de computadoras en México.\n\nServicios y precios:\n\n- Formateo + instalación de Windows + drivers básicos + activación limpia: $500 MXN\n- Instalación de Windows + Office + programas básicos: $650 MXN\n- Instalación de Windows + respaldo de archivos: $800 MXN\n- Instalación de drivers específicos: $200 MXN\n- Activación o reactivación de Office o Windows: $150 MXN\n- Instalación de software profesional: $400 MXN\n- Actualización a SSD: $1000 MXN más el costo del SSD\n\nReglas:\n\n- Responde siempre en español.\n- Sé breve y profesional.\n- Usa los precios anteriores cuando correspondan.\n- Nunca inventes precios.\n- Si falta información para cotizar, solicítala.\n- Si el servicio no aparece en la lista, indica que un técnico revisará el caso."
+        }
       },
       "type": "@n8n/n8n-nodes-langchain.agent",
       "typeVersion": 3.1,
@@ -78,23 +80,113 @@
         416,
         0
       ],
-      "id": "8d24ea19-3467-4262-bca4-bb1e2da8eccd",
+      "id": "6fafe204-b399-4af0-90df-fcacc2fde872",
       "name": "AI Agent"
     },
     {
       "parameters": {
-        "respondWith": "json",
-        "responseBody": "={\n  \"respuesta\": \"{{$json.output}}\"\n}",
         "options": {}
       },
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.5,
       "position": [
-        768,
+        896,
         0
       ],
-      "id": "fa833fbd-5386-4bb8-8ec6-631aa3639175",
+      "id": "8db6d595-cd41-45fb-98b0-fdf224878a78",
       "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "clientes",
+          "mode": "list",
+          "cachedResultName": "clientes"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "mensaje": "={{ $('Edit Fields').item.json.mensaje }}",
+            "respuesta": "={{ $('AI Agent').item.json.output }}",
+            "estado": "nuevo"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "fecha",
+              "displayName": "fecha",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "mensaje",
+              "displayName": "mensaje",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "respuesta",
+              "displayName": "respuesta",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "estado",
+              "displayName": "estado",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        720,
+        0
+      ],
+      "id": "73a454a7-865f-41fe-8727-767cb7fa5758",
+      "name": "Insert rows in a table",
+      "credentials": {
+        "postgres": {
+          "id": "E6ynP6a6vBExCZJL",
+          "name": "Postgres account"
+        }
+      }
     }
   ],
   "pinData": {},
@@ -136,6 +228,17 @@
       "main": [
         [
           {
+            "node": "Insert rows in a table",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insert rows in a table": {
+      "main": [
+        [
+          {
             "node": "Respond to Webhook",
             "type": "main",
             "index": 0
@@ -150,12 +253,12 @@
     "binaryMode": "separate",
     "availableInMCP": false
   },
-  "versionId": "a7f3880e-67b5-40df-971e-2414dbd5051d",
+  "versionId": "9b0dd1e2-8d3a-4eb2-8d38-10bc9f0cec51",
   "meta": {
     "templateCredsSetupCompleted": true,
-    "instanceId": "2bb3dcc5c596ad4c376ce061dfe8f2c68cbfb30a5fa40ebfafb72f3c49176e8e"
+    "instanceId": "8323dd33f2b84ef05a84543c7358304d920a64a1268b6ff38c8d9d0bcf4561cc"
   },
   "nodeGroups": [],
-  "id": "LetROuJvGNdTZOE9",
+  "id": "RsE8589gaywUvcnb",
   "tags": []
 }
